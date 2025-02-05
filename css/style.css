@@ -1,3 +1,4 @@
+/* Resete básico e Estilos globais*/
 * {
   margin: 0;
   padding: 0;
@@ -6,6 +7,7 @@
   font-family: 'Arial', sans-serif;
 }
 
+/* Corpo da pagina */
 body {
   font-family: 'Arial', sans-serif;
   background: url('../img/Fundo.jpg') no-repeat center center fixed;
@@ -17,6 +19,7 @@ body {
   height: 100vh;
 }
 
+/*Notificações*/
 .notify {
   width: 100%;
   max-width: 400px;
@@ -34,6 +37,7 @@ body {
   background: #f44336;
 }
 
+/* Formulário */
 .form {
   width: 100%;
   max-width: 400px;
@@ -88,6 +92,7 @@ body {
   display: none;
 }
 
+/* Tabelas */
 .table {
   margin: 30px auto;
   border-collapse: collapse;
@@ -243,6 +248,7 @@ body {
   transition: background-color 0.3s ease;
 }
 
+/* Botão do carrinho*/
 .finalize-btn:hover {
   background: #45a049;
 }
@@ -384,6 +390,7 @@ body {
   }
 }
 
+/* Protetor de tela */
 #screenSaver {
   position: fixed;
   top: 0;
@@ -402,16 +409,16 @@ body {
 }
 
 #screenSaver h1 {
-  font-size: 8em; /* Tamanho do texto principal */
-  font-weight: bold; /* Negrito */
-  color: #fff; /* Cor do texto principal */
-  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8); /* Sombra para melhor visibilidade */
-  margin: 0; /* Remove espaçamento adicional */
+  font-size: 8em;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+  margin: 0;
 }
 
 #screenSaver h2 {
-  font-size: 1.5em; /* Tamanho do subtítulo */
-  color: #fff; /* Cor do subtítulo */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra para subtítulo */
-  margin-top: 10px; /* Espaçamento acima do subtítulo */
+  font-size: 1.5em;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin-top: 10px;
 }
