@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<!-- Tela de bloqueio -->
 <div id="screenSaver">
   <h1>SOS Papelaria</h1>
   <h2>Clique para entrar</h2>
@@ -14,12 +16,15 @@
 
 <div class="notify"></div>
 
+<!-- Formulário para colocar as informações -->
 <div class="form">
   <h2>Cadastro de Produtos</h2>
   <input type="text" id="productName" placeholder="Nome do Produto">
   <input type="number" id="price" placeholder="Preço (R$)" step="0.01">
   <input type="number" id="quantity" placeholder="Quantidade">
   <select id="category">
+
+    <!-- Seleção das categorias -->
     <option value="" disabled selected>Selecione a Categoria</option>
     <option value="Caneta">Caneta</option>
     <option value="Papel">Papel</option>
@@ -27,6 +32,8 @@
     <option value="Impressora">Impressora</option>
     <option value="Acessórios">Acessórios</option>
   </select>
+
+  <!-- Botões para cadastro de produto, e atualização (quando clicado em atualizar produto, o de cadastro some e o de atualizar aparece nolugar) -->
   <button id="add_Data" class="add_Data">Adicionar Produto</button>
   <button id="update_data" class="update_data hide">Atualizar Produto</button>
 </div>
@@ -36,6 +43,7 @@
   <div id="categoryTables"></div>
 </div>
 
+<!-- tabela do carrinho -->
 <div class="cart">
   <h2>Carrinho de Vendas</h2>
   <table>
