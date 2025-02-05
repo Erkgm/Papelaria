@@ -1,25 +1,27 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+
+// Importa as funções necessárias do Firestore para interagir com o banco de dados
 import {
-  getFirestore,
-  addDoc,
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  getDoc,
-  updateDoc
+  getFirestore,   // Obtém uma instância do Firestore (banco de dados NoSQL)
+  addDoc,         // Adiciona um novo documento em uma coleção
+  collection,     // Obtém uma referência a uma coleção no Firestore
+  getDocs,        // Obtém todos os documentos de uma coleção
+  deleteDoc,      // Exclui um documento específico
+  doc,           // Obtém a referência de um documento no Firestore
+  getDoc,        // Obtém um documento específico pelo ID
+  updateDoc      // Atualiza um documento existente no Firestore
 } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAOGc6QaDsb3_1vhzrOieaePH5REdP4hQA",
-  authDomain: "crudfirestore-f44b4.firebaseapp.com",
-  projectId: "crudfirestore-f44b4",
-  storageBucket: "crudfirestore-f44b4.firebasestorage.app",
-  messagingSenderId: "302268959430",
-  appId: "1:302268959430:web:08cb825e36782b733065c7"
+  apiKey: "AIzaSyAOGc6QaDsb3_1vhzrOieaePH5REdP4hQA", // Chave de API para autenticar o acesso ao Firebase
+  authDomain: "crudfirestore-f44b4.firebaseapp.com", // Domínio de autenticação do Firebase
+  projectId: "crudfirestore-f44b4", // ID do projeto no Firebase
+  storageBucket: "crudfirestore-f44b4.firebasestorage.app", // URL do armazenamento de arquivos no Firebase
+  messagingSenderId: "302268959430", // ID do remetente usado para notificações push
+  appId: "1:302268959430:web:08cb825e36782b733065c7" // ID do aplicativo no Firebase
 };
 
-// Inicializando o Firebase
+// Inicizlização do Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -31,12 +33,12 @@ const categoryTables = document.querySelector('#categoryTables');
 const cartItems = document.querySelector('#cartItems');
 const cartTotal = document.querySelector('#cartTotal');
 const finalizeSaleBtn = document.querySelector('#finalizeSale');
-
 let cart = [];
 
 // Esconde o botão de atualizar por padrão
 updateDataBtn.classList.add('hide');
 
+// Notificação para cadastro (Se deu certo ou errado)
 function showNotification(message, isError = false) {
   notify.innerHTML = message;
   notify.classList.toggle('error', isError);
@@ -44,6 +46,7 @@ function showNotification(message, isError = false) {
   setTimeout(() => notify.style.display = 'none', 3000);
 }
 
+// Atualização do botão cadastro de produto e o de atualizar
 function toggleUpdateMode(showUpdate = false) {
   if (showUpdate) {
     updateDataBtn.classList.remove('hide');
@@ -54,6 +57,7 @@ function toggleUpdateMode(showUpdate = false) {
   }
 }
 
+// Função para resetar o formulário de cadastro de produto sempre que cadastrar ou atualizar
 function resetForm() {
   document.querySelector('#productName').value = "";
   document.querySelector('#price').value = "";
@@ -62,17 +66,21 @@ function resetForm() {
   toggleUpdateMode(false);
 }
 
+// Função para adicionar o produto no Firestore
 async function addData() {
+  // valores do formulário
   const productName = document.querySelector('#productName').value;
   const price = parseFloat(document.querySelector('#price').value);
   const quantity = parseInt(document.querySelector('#quantity').value, 10);
   const category = document.querySelector('#category').value;
 
+  // Ve se todos os campos foram preenchidos
   if (!productName || isNaN(price) || isNaN(quantity) || !category) {
     showNotification("Por favor, preencha todos os campos!", true);
     return;
   }
 
+  // Add um novo documento à coleção "products"
   try {
     await addDoc(collection(db, "products"), {
       productName,
@@ -89,11 +97,13 @@ async function addData() {
   }
 }
 
+// Função para buscar os produtos no Firesatore e exibir na tela/tabela
 async function getData() {
   try {
+    //obtem os produtos da coleção
     const querySnapshot = await getDocs(collection(db, "products"));
     const categories = ["Caneta", "Papel", "Caderno", "Impressora", "Acessórios"];
-    const categoryData = {};
+    const categoryData = {}; //Armazerar os produtoes organizados por categorias
 
     // Inicializa categorias vazias
     categories.forEach(cat => {
@@ -158,7 +168,7 @@ async function getData() {
   }
 }
 
-
+// Deletar os produtos do documento Firestore
 window.deleteProduct = async function (id) {
   try {
     await deleteDoc(doc(db, "products", id));
@@ -170,18 +180,21 @@ window.deleteProduct = async function (id) {
   }
 };
 
+// Atualziar os produtos no Firestore
 window.updateData = async function (id) {
   try {
     const docSnapshot = await getDoc(doc(db, "products", id));
-    const currentData = docSnapshot.data();
+    const currentData = docSnapshot.data(); // Pega os dados atuais do documento
+    //Preenche os campos do formulário para atualizar o produto selecionado
     document.querySelector('#productName').value = currentData.productName;
     document.querySelector('#price').value = currentData.price;
     document.querySelector('#quantity').value = currentData.quantity;
     document.querySelector('#category').value = currentData.category;
 
-    toggleUpdateMode(true);
+    toggleUpdateMode(true); // Bottão de atualizar aparece
 
     updateDataBtn.addEventListener('click', async function handleUpdate() {
+      // Obtém os novos valores preenchidos
       const newProductName = document.querySelector('#productName').value;
       const newPrice = parseFloat(document.querySelector('#price').value);
       const newQuantity = parseInt(document.querySelector('#quantity').value, 10);
@@ -192,6 +205,7 @@ window.updateData = async function (id) {
         return;
       }
 
+      // Atualiza no Firestore
       await updateDoc(doc(db, "products", id), {
         productName: newProductName,
         price: newPrice,
@@ -213,11 +227,12 @@ window.updateData = async function (id) {
 // Função para registrar uma venda no Firestore
 async function registerSale(productName, price, quantity, totalPrice) {
   try {
+    // add um novo na coeção vendas
     await addDoc(collection(db, "vendas"), {
       productName: productName,
       price: price,
       quantity: quantity,
-      totalPrice: totalPrice, // Armazena o preço total da venda
+      totalPrice: totalPrice,
       date: new Date().toISOString() // Registra a data e hora da venda
     });
 
@@ -225,20 +240,10 @@ async function registerSale(productName, price, quantity, totalPrice) {
   } catch (error) {
     showNotification("Erro ao registrar a venda!", true);
   }
-}
-
-window.addToCart = function (id, productName, price, availableQuantity) {
-  const existingItem = cart.find(item => item.id === id);
-
-  if (existingItem) {
-    existingItem.quantity++;
-  } else {
-    cart.push({ id, productName, price, quantity: 1, availableQuantity });
-  }
-
-  renderCart();
 };
 
+
+//Função para mostrar o carrinho
 function renderCart() {
   const cartTableBody = document.querySelector('#cartItems');
   const cartTotalElement = document.querySelector('#cartTotal');
@@ -248,6 +253,7 @@ function renderCart() {
   cartTableBody.innerHTML = "";
   let total = 0;
 
+  // Calculo para fazer o preço
   cart.forEach(item => {
     const subtotal = item.price * item.quantity;
     total += subtotal;
@@ -255,15 +261,18 @@ function renderCart() {
     // Clona o template do item do carrinho
     const cartItemClone = cartItemTemplate.content.cloneNode(true);
 
+    // preenchendo os dados do item
     cartItemClone.querySelector('.cart-product-name').textContent = item.productName;
     cartItemClone.querySelector('.cart-product-price').textContent = `R$ ${item.price.toFixed(2)}`;
 
+    // Configura o campo de entrada de quantidade para fazer alteração
     const quantityInput = cartItemClone.querySelector('.cart-product-quantity');
     quantityInput.value = item.quantity;
     quantityInput.min = 1;
     quantityInput.max = item.availableQuantity;
     quantityInput.addEventListener("change", () => updateCartQuantity(item.id, quantityInput.value));
 
+    // preendhe o valor total
     cartItemClone.querySelector('.cart-product-subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
 
     // Botão de remover item do carrinho
@@ -279,16 +288,18 @@ function renderCart() {
   finalizeSaleBtn.disabled = cart.length === 0;
 }
 
+// Remover item do carro
 function removeFromCart(id) {
   cart = cart.filter(item => item.id !== id);
   renderCart();
 }
 
-
+// Proucura no carrinho um produto com o id requerido
 window.updateCartQuantity = function (id, newQuantity) {
   const item = cart.find(product => product.id === id);
-  newQuantity = parseInt(newQuantity, 10);
+  newQuantity = parseInt(newQuantity, 10); // Coonvertendo para int
 
+  //Se item estiver no carrinho e a quantidade for valida, atualiza o quantidade do produto
   if (item && newQuantity > 0 && newQuantity <= item.availableQuantity) {
     item.quantity = newQuantity;
     renderCart();
@@ -328,11 +339,10 @@ async function finalizeSale() {
       }
     }
 
-    cart = []; // Limpa o carrinho após a venda
-    renderCart(); // Atualiza a exibição do carrinho
-    getData(); // Atualiza a lista de produtos
+    cart = [];
+    renderCart();
+    getData();
 
-    // Exibe o total da venda
     showNotification(`Venda finalizada! Total: R$ ${totalSaleAmount.toFixed(2)}`);
 
   } catch (error) {
@@ -347,6 +357,7 @@ addBtn.addEventListener('click', addData);
 
 getData();
 
+// Protetor de tela
 document.getElementById("screenSaver").onclick = function() {
   this.style.display = 'none';
 };
@@ -363,12 +374,12 @@ const clientTemplate = document.querySelector('#client-template');
 
 let editingClientId = null; // ID do cliente que está sendo editado
 
-// Função para validar CPF (Formato XXX.XXX.XXX-XX)
+//  validar CPF (Formato XXX.XXX.XXX-XX)
 function isValidCPF(cpf) {
   return /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf);
 }
 
-// 📌 Função para cadastrar um novo cliente no Firestore
+//Função para cadastrar um novo cliente no Firestore
 async function addClient() {
   const name = clientNameInput.value.trim();
   const email = clientEmailInput.value.trim();
@@ -385,6 +396,7 @@ async function addClient() {
     return;
   }
 
+  // Adicionando o cliente no Firebase
   try {
     await addDoc(collection(db, "clientes"), {
       name: name,
@@ -401,7 +413,7 @@ async function addClient() {
   }
 }
 
-// 📌 Função para carregar clientes do Firestore
+// Função para carregar clientes do Firestore
 async function loadClients() {
   try {
     const querySnapshot = await getDocs(collection(db, "clientes"));
@@ -432,7 +444,7 @@ async function loadClients() {
   }
 }
 
-// 📌 Função para carregar dados do cliente para edição
+// Função para carregar dados do cliente para edição
 function loadClientForEdit(clientId, clientData) {
   clientNameInput.value = clientData.name;
   clientEmailInput.value = clientData.email;
@@ -444,7 +456,7 @@ function loadClientForEdit(clientId, clientData) {
   updateClientBtn.classList.remove("hide");
 }
 
-// 📌 Função para atualizar um cliente no Firestore
+// Função para atualizar um cliente no Firestore
 async function updateClient() {
   if (!editingClientId) return;
 
@@ -479,7 +491,7 @@ async function updateClient() {
   }
 }
 
-// 📌 Função para excluir um cliente do Firestore
+// Função para excluir um cliente do Firestore
 async function deleteClient(clientId) {
   try {
     await deleteDoc(doc(db, "clientes", clientId));
@@ -490,7 +502,7 @@ async function deleteClient(clientId) {
   }
 }
 
-// 📌 Função para limpar o formulário e restaurar os botões
+// Função para limpar o formulário e restaurar os botões
 function resetClientForm() {
   clientNameInput.value = "";
   clientEmailInput.value = "";
@@ -508,5 +520,19 @@ updateClientBtn.addEventListener("click", updateClient);
 
 // Carregar os clientes ao iniciar
 loadClients();
+
+window.addToCart = function (id, productName, price, availableQuantity) {
+  const existingItem = cart.find(item => item.id === id); // verifica se o produto já esta no carrinho
+
+  //se existir aumenta a quantidade e não duplica
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    // Se o produto não estiver no carrinho, adiciona um novo item com quantidade 1
+    cart.push({ id, productName, price, quantity: 1, availableQuantity });
+  }
+
+  renderCart();
+};
 
 
