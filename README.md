@@ -1,3 +1,5 @@
+**Acesse aqui para ver o site:** https://erkgm.github.io/Papelaria/
+
 CRUD com JavaScript, HTML, CSS e Firebase
 Este projeto, desenvolvido por Ricardo e Erick, é uma aplicação CRUD (Create, Read, Update, Delete) que utiliza JavaScript, HTML, CSS e Firebase para o banco de dados em tempo real.
 
